@@ -132,6 +132,7 @@ def get_viz(
         DatasourceType(datasource_type),
         datasource_id,
     )
+    # pdb.set_trace()
     viz_obj = viz.viz_types[viz_type](
         datasource, form_data=form_data, force=force, force_cached=force_cached
     )

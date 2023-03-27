@@ -108,6 +108,12 @@ WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
 
 SQLLAB_CTAS_NO_LIMIT = True
 
+TESTING = 1
+
+MAPBOX_API_KEY = 'pk.eyJ1IjoibWF0dGMxMjIxIiwiYSI6ImNsZnFjamh5bjFlanE0NHJ0Y2t0Nm1hM3cifQ.X2vLahoWDPjOCxa1Y-cgjw'
+ENABLE_CORS=True
+CORS_ORIGIN = '*'
+
 #
 # Optionally import superset_config_docker.py (which will have been included on
 # the PYTHONPATH) in order to allow for local settings to be overridden
