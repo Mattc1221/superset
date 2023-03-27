@@ -25,3 +25,6 @@
 
 SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://pguser:pgpwd@some.host/superset"
 SQLALCHEMY_ECHO = True
+
+
+TESTING = 1
