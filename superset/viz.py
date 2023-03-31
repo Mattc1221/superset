@@ -54,6 +54,7 @@ from flask import request
 from flask_babel import lazy_gettext as _
 from geopy.point import Point
 from pandas.tseries.frequencies import to_offset
+import pdb
 
 from superset import app
 from superset.common.db_query_status import QueryStatus
@@ -2858,12 +2859,14 @@ class DeckHex(BaseDeckGLViz):
     spatial_control_keys = ["spatial"]
 
     def get_properties(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        # pdb.set_trace()
         return {
             "position": data.get("spatial"),
             "weight": (data.get(self.metric_label) if self.metric_label else None) or 1,
         }
 
     def get_data(self, df: pd.DataFrame) -> VizData:
+        # pdb.set_trace()
         self.metric_label = (  # pylint: disable=attribute-defined-outside-init
             utils.get_metric_name(self.metric) if self.metric else None
         )
@@ -2878,13 +2881,20 @@ class DeckHeatmap(BaseDeckGLViz):
     spatial_control_keys = ["spatial"]
 
     def get_properties(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        print(data)
+        # pdb.set_trace()
+        weight = 1
+        if (self.metric_label):
+            weight = data.get(self.metric_label)
         return {
             "position": data.get("spatial"),
-            "weight": 1, #(data.get(self.metric_label) if self.metric_label else None) or 1,
+            "weight": (data.get(self.metric_label) if self.metric_label else None) or 1,
         }
 
     def get_data(self, df: pd.DataFrame) -> VizData:
+        # pdb.set_trace()
+        self.metric_label = (  # pylint: disable=attribute-defined-outside-init
+            utils.get_metric_name(self.metric) if self.metric else None
+        )
         return super().get_data(df)
 
 class DeckGeoJson(BaseDeckGLViz):

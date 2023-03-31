@@ -20,8 +20,6 @@ import { HeatmapLayer } from 'deck.gl';
 import React from 'react';
 import { t /* , CategoricalColorNamespace */ } from '@superset-ui/core';
 import { commonLayerProps /* , getAggFunc */ } from '../common';
-// import sandboxedEval from '../../utils/sandbox';
-// import { hexToRGB } from '../../utils/colors';
 import { createDeckGLComponent } from '../../factory';
 import TooltipRow from '../../TooltipRow';
 
@@ -40,10 +38,18 @@ export function getLayer(formData, payload, onAddFilter, setTooltip) {
   const fd = formData;
   const data = payload.data.features;
 
+  // TODO: add fd.js_data_mutator -- not sure if applicable
+  // TODO: add aggFunc -- not sure if applicable
+  // TODO: add control panel options for radius and intensity
+
+  const { intensity = 1, radius_pixels: radiusPixels = 30 } = formData;
+
   return new HeatmapLayer({
     id: `heatmp-layer-${fd.slice_id}`,
     data,
     pickable: false,
+    intensity,
+    radiusPixels,
     getPosition: d => d.position,
     getWeight: d => d.weight,
     ...commonLayerProps(fd, setTooltip, setTooltipContent),

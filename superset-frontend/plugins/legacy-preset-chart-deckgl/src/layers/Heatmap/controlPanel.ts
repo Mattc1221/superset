@@ -18,10 +18,16 @@
  */
 import {
   ControlPanelConfig,
-  getStandardizedControls,
+  // getStandardizedControls,
   sections,
+  formatSelectOptions,
 } from '@superset-ui/chart-controls';
-import { t } from '@superset-ui/core';
+import {
+  t,
+  validateNonEmpty,
+  legacyValidateNumber,
+  legacyValidateInteger,
+} from '@superset-ui/core';
 import {
   autozoom,
   extruded,
@@ -36,6 +42,15 @@ import {
   viewport,
 } from '../../utilities/Shared_DeckGL';
 
+const INTENSITY_OPTIONS = Array.from(
+  { length: 10 },
+  (_, index) => index / 10 + 0.1,
+);
+const RADIUS_PIXEL_OPTIONS = Array.from(
+  { length: 15 },
+  (_, index) => index * 5,
+);
+
 const config: ControlPanelConfig = {
   controlPanelSections: [
     sections.legacyRegularTime,
@@ -48,6 +63,38 @@ const config: ControlPanelConfig = {
         ['row_limit'],
         [filterNulls],
         ['adhoc_filters'],
+        [
+          {
+            // TODO: add translations
+            name: 'intensity',
+            config: {
+              type: 'SelectControl',
+              label: 'Intesity',
+              description:
+                'Intensity is the value multiplied by the weight to obtain the final weight',
+              freeForm: true,
+              validators: [legacyValidateNumber],
+              default: 1,
+              choices: formatSelectOptions(INTENSITY_OPTIONS),
+            },
+          },
+        ],
+        [
+          {
+            // TODO: add translations
+            name: 'radius_pixels',
+            config: {
+              type: 'SelectControl',
+              label: 'Intensity Radius',
+              description:
+                'Intensity Radius is the radius at which the weight is distributed',
+              freeForm: true,
+              validators: [legacyValidateInteger],
+              default: 30,
+              choices: formatSelectOptions(RADIUS_PIXEL_OPTIONS),
+            },
+          },
+        ],
       ],
     },
     {
@@ -99,9 +146,15 @@ const config: ControlPanelConfig = {
       ],
     },
   ],
+  controlOverrides: {
+    size: {
+      label: t('Weight'),
+      description: t("Metric used as a weight for the grid's coloring"),
+      validators: [validateNonEmpty],
+    },
+  },
   formDataOverrides: formData => ({
     ...formData,
-    size: getStandardizedControls().shiftMetric(),
   }),
 };
 
