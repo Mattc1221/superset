@@ -18,7 +18,6 @@
  */
 import {
   ControlPanelConfig,
-  // getStandardizedControls,
   sections,
   formatSelectOptions,
 } from '@superset-ui/chart-controls';
@@ -30,9 +29,7 @@ import {
 } from '@superset-ui/core';
 import {
   autozoom,
-  extruded,
   filterNulls,
-  gridSize,
   jsColumns,
   jsDataMutator,
   jsOnclickHref,
@@ -44,11 +41,11 @@ import {
 
 const INTENSITY_OPTIONS = Array.from(
   { length: 10 },
-  (_, index) => index / 10 + 0.1,
+  (_, index) => (index + 1) / 10,
 );
 const RADIUS_PIXEL_OPTIONS = Array.from(
-  { length: 15 },
-  (_, index) => index * 5,
+  { length: 14 },
+  (_, index) => index * 5 + 5,
 );
 
 const config: ControlPanelConfig = {
@@ -73,6 +70,7 @@ const config: ControlPanelConfig = {
               description:
                 'Intensity is the value multiplied by the weight to obtain the final weight',
               freeForm: true,
+              clearable: false,
               validators: [legacyValidateNumber],
               default: 1,
               choices: formatSelectOptions(INTENSITY_OPTIONS),
@@ -89,6 +87,7 @@ const config: ControlPanelConfig = {
               description:
                 'Intensity Radius is the radius at which the weight is distributed',
               freeForm: true,
+              clearable: false,
               validators: [legacyValidateInteger],
               default: 30,
               choices: formatSelectOptions(RADIUS_PIXEL_OPTIONS),
@@ -101,16 +100,14 @@ const config: ControlPanelConfig = {
       label: t('Map'),
       controlSetRows: [
         [mapboxStyle, viewport],
-        ['color_scheme'],
+        ['linear_color_scheme'],
         [autozoom],
-        [gridSize],
-        [extruded],
         [
           {
-            name: 'js_agg_function',
+            name: 'aggregation',
             config: {
               type: 'SelectControl',
-              label: t('Dynamic Aggregation Function'),
+              label: t('Aggregation'),
               description: t(
                 'The function to use when aggregating points into groups',
               ),
@@ -119,17 +116,7 @@ const config: ControlPanelConfig = {
               renderTrigger: true,
               choices: [
                 ['sum', t('sum')],
-                ['min', t('min')],
-                ['max', t('max')],
                 ['mean', t('mean')],
-                ['median', t('median')],
-                ['count', t('count')],
-                ['variance', t('variance')],
-                ['deviation', t('deviation')],
-                ['p1', t('p1')],
-                ['p5', t('p5')],
-                ['p95', t('p95')],
-                ['p99', t('p99')],
               ],
             },
           },

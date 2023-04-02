@@ -18,8 +18,10 @@
  */
 import { HeatmapLayer } from 'deck.gl';
 import React from 'react';
-import { t /* , CategoricalColorNamespace */ } from '@superset-ui/core';
-import { commonLayerProps /* , getAggFunc */ } from '../common';
+import { t, getSequentialSchemeRegistry } from '@superset-ui/core';
+import { commonLayerProps } from '../common';
+import sandboxedEval from '../../utils/sandbox';
+import { hexToRGB } from '../../utils/colors';
 import { createDeckGLComponent } from '../../factory';
 import TooltipRow from '../../TooltipRow';
 
@@ -36,13 +38,28 @@ function setTooltipContent(o) {
 
 export function getLayer(formData, payload, onAddFilter, setTooltip) {
   const fd = formData;
-  const data = payload.data.features;
+  const {
+    intensity = 1,
+    radius_pixels: radiusPixels = 30,
+    aggregation = 'SUM',
+    js_data_mutator: jsFnMutator,
+    linear_color_scheme: colorScheme,
+  } = fd;
+  let data = payload.data.features;
 
-  // TODO: add fd.js_data_mutator -- not sure if applicable
-  // TODO: add aggFunc -- not sure if applicable
-  // TODO: add control panel options for radius and intensity
+  if (jsFnMutator) {
+    // Applying user defined data mutator if defined
+    const jsFnMutatorFunction = sandboxedEval(fd.js_data_mutator);
+    data = jsFnMutatorFunction(data);
+  }
 
-  const { intensity = 1, radius_pixels: radiusPixels = 30 } = formData;
+  const colorScale = getSequentialSchemeRegistry()
+    .get(colorScheme)
+    .createLinearScale([0, 6]);
+  const colorRange = colorScale
+    .range()
+    .map(color => hexToRGB(color))
+    .reverse();
 
   return new HeatmapLayer({
     id: `heatmp-layer-${fd.slice_id}`,
@@ -50,8 +67,10 @@ export function getLayer(formData, payload, onAddFilter, setTooltip) {
     pickable: false,
     intensity,
     radiusPixels,
+    colorRange,
+    aggregation: aggregation.toUpperCase(),
     getPosition: d => d.position,
-    getWeight: d => d.weight,
+    getWeight: d => (d.weight ? d.weight : 1),
     ...commonLayerProps(fd, setTooltip, setTooltipContent),
   });
 }
